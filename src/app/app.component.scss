@@ -2,6 +2,9 @@
   position: relative;
   width: 150px;
   height: 150px;
-  background: blue;
   cursor: pointer;
+}
+
+.dragged {
+  z-index: 3;
 }

@@ -1,10 +1,16 @@
-<div style="text-align:center">
-  <h1>
-    Welcome to {{ title }}!
-  </h1>
-  <h2>Mouse position x: {{position}} Mouse position y: {{positiony}} MouseDown Count: {{counter}} MouseUp Count: {{counter2}}
+<div style="text-align: center;">
+  <h1>Welcome to {{ title }}!</h1>
+  <h2>
+    Elo 3 2 0
   </h2>
 </div>
 <div>
-  <div class="box" width="300" alt="Angular Logo"></div>
+  <div
+    *ngFor="let box of boxes; index as index"
+    class="box"
+    [attr.data-index]="index"
+    [class.dragged]="isDragged(index)"
+    width="300"
+    [style.backgroundColor]="box.color"
+  ></div>
 </div>

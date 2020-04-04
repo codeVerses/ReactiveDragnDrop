@@ -1,6 +1,7 @@
 import { Component } from "@angular/core";
-import { mergeMap, map, takeUntil } from "rxjs/operators";
+import { mergeMap, map, takeUntil, tap } from "rxjs/operators";
 import { fromEvent, Observable } from "rxjs";
+import { boxes, Ibox } from "./data/boxes";
 
 interface mdObj {
   clientX: number;
@@ -24,6 +25,8 @@ interface positionInt {
   styleUrls: ["./app.component.scss"],
 })
 export class AppComponent {
+  public boxes = boxes;
+  public dragIndex;
   title = "Drag and Drop";
   position = 0;
   positiony = 0;
@@ -32,47 +35,64 @@ export class AppComponent {
   md: mdObj;
 
   ngOnInit() {
-    const target = <HTMLElement>document.querySelector(".box");
+    console.log("READY", boxes);
+  }
 
-    const mousemove = fromEvent(document, "mousemove");
-    const mousedown = fromEvent(target, "mousedown");
-    const mouseup = fromEvent(target, "mouseup");
+  ngAfterViewInit() {
+    const targets = document.querySelectorAll(".box") as NodeListOf<
+      HTMLElement
+    >;
+    targets.forEach((target) => {
+      // const target = document.querySelectorAll(".box") as HTMLElement;
 
-    // const mousedrag: Observable<positionInt> = mousedown.pipe(
-    //   mergeMap((md: mdObj) => {
-    //     let startX = md.clientX + window.scrollX,
-    //       startY = md.clientY + window.scrollY,
-    //       startLeft = parseInt(md.target.style.left, 10) || 0,
-    //       startTop = parseInt(md.target.style.top, 10) || 0;
-    //     return mousemove.pipe(
-    //       map((mm: Event) => {
-    //         mm.preventDefault();
-    //         return {
-    //           left: startLeft + mm["clientX"] - startX,
-    //           top: startTop + mm["clientY"] - startY
-    //         };
-    //       }),
-    //       takeUntil(mouseup)
-    //     );
-    //   })
-    // );
+      const mousemove = fromEvent(document, "mousemove");
+      const mousedown = fromEvent(target, "mousedown");
+      const mouseup = fromEvent(target, "mouseup");
 
-    // mousedrag.subscribe(pos => {
-    //   target.style.top = pos.top + "px";
-    //   target.style.left = pos.left + "px";
+      const mousedrag: Observable<positionInt> = mousedown.pipe(
+        tap((md: MouseEvent) => {
+          console.log("ind", (md.target as HTMLElement).dataset.index);
+          this.dragIndex = (md.target as HTMLElement).dataset.index;
+        }),
+        mergeMap((md: MouseEvent) => {
+          let startX = md.clientX + window.scrollX,
+            startY = md.clientY + window.scrollY,
+            startLeft =
+              parseInt((md.target as HTMLElement).style.left, 10) || 0,
+            startTop = parseInt((<HTMLElement>md.target).style.top, 10) || 0;
+          return mousemove.pipe(
+            map((mm: MouseEvent) => {
+              mm.preventDefault();
+              return {
+                left: startLeft + mm["clientX"] - startX,
+                top: startTop + mm["clientY"] - startY,
+              };
+            }),
+            takeUntil(mouseup)
+          );
+        })
+      );
+
+      mousedrag.subscribe((pos) => {
+        target.style.top = pos.top + "px";
+        target.style.left = pos.left + "px";
+      });
+    });
+
+    // mousemove.subscribe((pos) => {
+    //   this.position = pos["pageX"];
+    //   this.positiony = pos["pageY"];
     // });
 
-    mousemove.subscribe((pos) => {
-      this.position = pos["pageX"];
-      this.positiony = pos["pageY"];
-    });
+    // mousedown.subscribe((e) => {
+    //   this.counter++;
+    // });
 
-    mousedown.subscribe((e) => {
-      this.counter++;
-    });
-
-    mouseup.subscribe((e) => {
-      this.counter2++;
-    });
+    // mouseup.subscribe((e) => {
+    //   this.counter2++;
+    // });
+  }
+  isDragged(index: number) {
+    return index == this.dragIndex;
   }
 }
