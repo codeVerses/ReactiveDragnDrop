@@ -21,7 +21,7 @@ interface positionInt {
 @Component({
   selector: "app-root",
   templateUrl: "./app.component.html",
-  styleUrls: ["./app.component.css"]
+  styleUrls: ["./app.component.css"],
 })
 export class AppComponent {
   title = "Drag and Drop";
@@ -38,40 +38,40 @@ export class AppComponent {
     const mousedown = fromEvent(target, "mousedown");
     const mouseup = fromEvent(target, "mouseup");
 
-    const mousedrag: Observable<positionInt> = mousedown.pipe(
-      mergeMap((md: mdObj) => {
-        let startX = md.clientX + window.scrollX,
-          startY = md.clientY + window.scrollY,
-          startLeft = parseInt(md.target.style.left, 10) || 0,
-          startTop = parseInt(md.target.style.top, 10) || 0;
-        return mousemove.pipe(
-          map((mm: Event) => {
-            mm.preventDefault();
-            return {
-              left: startLeft + mm["clientX"] - startX,
-              top: startTop + mm["clientY"] - startY
-            };
-          }),
-          takeUntil(mouseup)
-        );
-      })
-    );
+    // const mousedrag: Observable<positionInt> = mousedown.pipe(
+    //   mergeMap((md: mdObj) => {
+    //     let startX = md.clientX + window.scrollX,
+    //       startY = md.clientY + window.scrollY,
+    //       startLeft = parseInt(md.target.style.left, 10) || 0,
+    //       startTop = parseInt(md.target.style.top, 10) || 0;
+    //     return mousemove.pipe(
+    //       map((mm: Event) => {
+    //         mm.preventDefault();
+    //         return {
+    //           left: startLeft + mm["clientX"] - startX,
+    //           top: startTop + mm["clientY"] - startY
+    //         };
+    //       }),
+    //       takeUntil(mouseup)
+    //     );
+    //   })
+    // );
 
-    mousedrag.subscribe(pos => {
-      target.style.top = pos.top + "px";
-      target.style.left = pos.left + "px";
-    });
+    // mousedrag.subscribe(pos => {
+    //   target.style.top = pos.top + "px";
+    //   target.style.left = pos.left + "px";
+    // });
 
-    mousemove.subscribe(pos => {
+    mousemove.subscribe((pos) => {
       this.position = pos["pageX"];
       this.positiony = pos["pageY"];
     });
 
-    mousedown.subscribe(e => {
+    mousedown.subscribe((e) => {
       this.counter++;
     });
 
-    mouseup.subscribe(e => {
+    mouseup.subscribe((e) => {
       this.counter2++;
     });
   }
